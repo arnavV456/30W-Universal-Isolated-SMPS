@@ -1,77 +1,74 @@
 # Design Decisions
 
-This document outlines the engineering decisions made during the design of the **Universal 24W Isolated AC-DC Flyback Power Supply**.
+This document outlines the key engineering decisions made during the design of the **Universal 30W Isolated AC-DC Flyback Power Supply**.
 
 ---
 
 # Why I Selected the MYRRA 74030 Transformer
 
-The transformer is the most critical component in an isolated flyback converter, influencing efficiency, regulation, thermal performance, and safety.
+The transformer is the heart of an isolated flyback converter, directly influencing efficiency, regulation, thermal performance, and electrical safety.
 
-Instead of using an undocumented generic transformer, I selected the **MYRRA 74030** because it is a commercially manufactured transformer with published winding information, reinforced insulation, and documented compatibility with several offline flyback controllers.
+Instead of using an undocumented generic transformer, I selected the **MYRRA 74030** because it is a commercially manufactured transformer with published specifications, reinforced insulation, and documented electrical characteristics.
 
 The transformer provides:
 
 - 4 kV reinforced isolation
 - 6 mm creepage distance
 - Universal 85–265 VAC operation
-- 30 W power capability
+- 30 W continuous power capability
 - Published winding specifications
+- Proven industrial reliability
 
-Using a transformer with manufacturer documentation significantly reduces design risk while improving reliability and repeatability.
+Using a transformer with comprehensive manufacturer documentation significantly reduces design risk while improving reliability, repeatability, and long-term maintainability.
 
 ---
 
 # Why I Chose the TOP244Y Controller
 
-Rather than using a low-cost controller with limited documentation, I selected the **Power Integrations TOP244Y** because it is supported by extensive reference designs, application notes, and proven commercial implementations.
+The **Power Integrations TOP244Y** was selected for its mature offline flyback architecture, integrated high-voltage power MOSFET, and extensive protection features. It is specifically designed for low-to-medium power isolated AC-DC converters operating from universal mains input.
 
-The MYRRA 74030 transformer is specifically listed as compatible with the TOP244Y for universal input operation, allowing the design to build upon a validated ecosystem rather than reverse-engineering an undocumented solution.
+Compared to discrete controller solutions, the TOP244Y significantly reduces component count while maintaining excellent reliability, efficiency, and electromagnetic compatibility.
 
 Advantages include:
 
-- Extensive application documentation
-- Proven commercial reliability
-- Built-in protection features
+- Integrated 700 V power MOSFET
+- Universal input (85–265 VAC) operation
+- Built-in current limiting
+- Thermal shutdown protection
+- Soft-start functionality
+- Reduced external component count
 - Excellent EMI performance
-- Large engineering community and reference material
+- Proven industrial reliability
+
+These features make it well suited for a compact, isolated 30 W flyback converter.
 
 ---
 
-# Why the Flyback Output is 12V / 2A
+# Why the Flyback Output is 12V / 2.5A
 
-Although the original design target was:
+The power supply is designed to deliver a regulated **12 V output capable of supplying up to 2.5 A**, allowing the converter to utilize the full capability of the selected transformer while providing additional flexibility for future applications.
 
-- 12V @ 1A
-- 5V @ 1A
+The available output power is shared between:
 
-both outputs may be required simultaneously.
-
-Since the 5V rail is generated from the 12V rail using a buck converter, the flyback stage must supply:
-
-- External 12V load
-- Power consumed by the buck converter
+- External 12 V loads
+- On-board 5 V buck converter
 - Conversion losses
 
-Therefore, the flyback converter is designed for:
+Designing for the full **30 W** capability provides:
 
-**12V @ 2A (24W)**
+- Additional thermal margin during normal operation
+- Greater flexibility for future applications
+- Improved support for transient loads
+- Better utilization of the transformer
+- Lower component stress during typical operation
 
-This provides sufficient headroom for:
-
-- Continuous full-load operation
-- Buck converter input power
-- Startup transients
-- Component derating
-- Thermal margin
-
-Operating the 30W transformer below its maximum rating also improves efficiency and long-term reliability.
+The 5 V rail is generated from the regulated 12 V output using a high-efficiency buck converter, allowing both outputs to share the available power while maintaining excellent regulation.
 
 ---
 
 # Why Generate 5V Using a Buck Converter
 
-Instead of designing a dual-output flyback converter with separate regulated secondary windings, the design regulates a single **12V output** and derives **5V** using a high-efficiency buck converter.
+Instead of designing a dual-output flyback converter with separate regulated secondary windings, the design regulates a single **12 V output** and derives **5 V** using a high-efficiency buck converter.
 
 Advantages include:
 
@@ -81,7 +78,8 @@ Advantages include:
 - Easier compensation
 - Lower output ripple
 - Reduced design complexity
-- Easier debugging and testing
+- Easier debugging and validation
+- Greater flexibility for future output voltages
 
 Modern synchronous buck converters typically exceed **90% efficiency**, making this approach highly efficient while maintaining excellent output regulation.
 
@@ -118,42 +116,41 @@ The input stage therefore includes:
 | Component | Purpose |
 |-----------|---------|
 | Fuse | Protects against catastrophic faults |
-| MOV | Absorbs mains surge voltages |
-| NTC Thermistor | Limits inrush current |
-| Common-Mode Choke | Reduces conducted EMI |
+| MOV | Suppresses mains surge voltages |
+| NTC Thermistor | Limits inrush current during startup |
+| Common-Mode Choke | Reduces conducted common-mode EMI |
 | X-Class Capacitor | Suppresses differential-mode noise |
 | Y-Class Capacitor | Suppresses common-mode noise while maintaining isolation |
 
-These components improve:
+Together, these components improve:
 
-- Safety
+- Electrical safety
 - Reliability
-- EMC performance
+- Electromagnetic compatibility (EMC)
 - Regulatory compliance
 
 ---
 
-# Why I Used a Commercially Available Transformer
+# Why Commercially Available Components Were Selected
 
-Designing a flyback transformer requires:
+Wherever possible, commercially available components with comprehensive documentation, established reliability, and long-term availability were selected.
 
-- Core selection
-- Air-gap calculation
-- Turns ratio calculation
-- Wire gauge selection
-- Leakage inductance optimization
-- Thermal validation
-- Safety insulation design
+Choosing components from established manufacturers provides several advantages:
 
-Rather than designing a custom transformer, this project uses a commercially manufactured transformer with documented characteristics and safety approvals.
+- Published electrical characteristics
+- Reliable thermal and safety performance
+- Consistent manufacturing quality
+- Long-term availability
+- Easier sourcing and replacement
+- Better confidence during design validation
 
-This reflects common industrial practice, where qualified magnetic components are often preferred over custom designs unless high-volume production justifies dedicated transformer development.
+Using well-documented components reduces engineering uncertainty and results in a more robust, maintainable, and reproducible design.
 
 ---
 
 # Why the Flyback Topology Was Chosen
 
-For power levels below approximately **50W**, the flyback converter offers the best balance of simplicity, cost, efficiency, and isolation.
+Among isolated converter topologies, the flyback converter provides the best balance of simplicity, cost, efficiency, and performance for power levels below approximately **50 W**.
 
 Advantages include:
 
@@ -163,24 +160,39 @@ Advantages include:
 - Low component count
 - Compact PCB footprint
 - Mature design ecosystem
-- Excellent efficiency in the 20–30W range
+- Excellent efficiency in the 20–30 W range
+- Wide availability of compatible components
 
-For a universal-input **24W** power supply, the flyback topology provides an ideal balance between performance, manufacturability, and design complexity.
+For a universal-input **30 W** AC-DC power supply, the flyback topology provides an ideal balance between performance, manufacturability, reliability, and design complexity.
 
 ---
 
 # Project Design Philosophy
 
-The objective of this project is not simply to produce a functioning power supply, but to develop a **professionally engineered offline SMPS** using industry-standard design practices.
+The objective of this project is not simply to produce a functioning power supply, but to develop a **professionally engineered offline switch-mode power supply** following industry-standard engineering practices.
 
-Key design goals include:
+The project emphasizes:
 
 - Reliability over minimum cost
-- Component selection based on manufacturer documentation
-- Compliance with high-voltage PCB layout practices
+- Careful component selection
+- High-voltage PCB layout best practices
+- Proper creepage and clearance
 - Robust thermal performance
-- Proper EMI mitigation
+- EMI-conscious design
 - Comprehensive documentation
-- Reproducible design decisions
+- Reproducible engineering decisions
 
-The final result aims to demonstrate not only PCB design skills but also a solid understanding of power electronics, isolation techniques, component selection, safety considerations, and engineering validation.
+Every major design decision is documented and justified to ensure the final hardware is maintainable, safe, and technically sound.
+
+The completed project is intended to demonstrate practical skills in:
+
+- Offline AC-DC power supply design
+- Flyback converter implementation
+- High-voltage PCB layout
+- Isolation and safety engineering
+- Component selection
+- Power electronics
+- Hardware validation and testing
+- Engineering documentation
+
+The goal is to produce a power supply that is not only functional, but also representative of professional engineering practices used in commercial embedded and industrial power electronics.
