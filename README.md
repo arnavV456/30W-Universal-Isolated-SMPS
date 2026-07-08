@@ -1,11 +1,11 @@
 # Universal Isolated SMPS
 
-24W isolated AC-DC flyback power supply.
+30W isolated AC-DC flyback power supply.
 
 ## Specifications
 
 - Input: 85–265 VAC
-- Output 1: 12V @ 2A
+- Output 1: 12V @ 2.5A
 - Output 2: 5V @ 1A
 - Isolation: 4kV
 - Topology: Flyback
