@@ -1,87 +1,186 @@
-Why I selected the MYRRA 74030 transformer
+# Design Decisions
 
-The transformer is the most critical component in an isolated flyback converter, influencing efficiency, regulation, thermal performance, and safety. Instead of using an undocumented generic transformer, I selected the MYRRA 74030 because it is a commercially manufactured transformer with published winding information, reinforced insulation, and documented compatibility with several offline flyback controllers. The transformer provides 4 kV isolation, 6 mm creepage, and is designed for 85–265 VAC offline applications up to 30 W, making it well suited for a 24 W design. Using a transformer with manufacturer documentation significantly reduces design risk and improves confidence in long-term reliability.
+This document outlines the engineering decisions made during the design of the **Universal 24W Isolated AC-DC Flyback Power Supply**.
 
-Why I chose the TOP244Y controller
+---
 
-Rather than using a low-cost controller with limited application documentation, I selected the TOP244Y because it is supported by extensive reference designs, application notes, and proven commercial implementations. The MYRRA 74030 transformer is specifically listed as compatible with the TOP244Y for 85–265 VAC operation, allowing the design to build upon a validated ecosystem instead of reverse-engineering an undocumented solution. This approach improves reliability, simplifies debugging, and results in a more professional design.
+# Why I Selected the MYRRA 74030 Transformer
 
-Why the flyback output is 12 V / 2 A
+The transformer is the most critical component in an isolated flyback converter, influencing efficiency, regulation, thermal performance, and safety.
 
-Although the original requirement was 12 V @ 1 A and 5 V @ 1 A, both outputs may be required simultaneously. Since the 5 V rail is generated from the 12 V rail using a buck converter, the flyback stage must supply both the external 12 V load and the power consumed by the buck converter.
+Instead of using an undocumented generic transformer, I selected the **MYRRA 74030** because it is a commercially manufactured transformer with published winding information, reinforced insulation, and documented compatibility with several offline flyback controllers.
 
-Designing the flyback for 12 V @ 2 A (24 W) provides sufficient power for:
+The transformer provides:
 
-12 V external load
-5 V buck converter
-Conversion losses
-Startup transients
-Thermal derating
+- 4 kV reinforced isolation
+- 6 mm creepage distance
+- Universal 85–265 VAC operation
+- 30 W power capability
+- Published winding specifications
 
-Operating the 30 W transformer below its maximum rating also improves reliability and reduces operating temperature.
+Using a transformer with manufacturer documentation significantly reduces design risk while improving reliability and repeatability.
 
-Why generate 5 V using a buck converter
+---
 
-Instead of designing a multi-output flyback with independent 5 V and 12 V secondary windings, I chose to regulate a single 12 V output and derive 5 V using a synchronous buck converter.
+# Why I Chose the TOP244Y Controller
+
+Rather than using a low-cost controller with limited documentation, I selected the **Power Integrations TOP244Y** because it is supported by extensive reference designs, application notes, and proven commercial implementations.
+
+The MYRRA 74030 transformer is specifically listed as compatible with the TOP244Y for universal input operation, allowing the design to build upon a validated ecosystem rather than reverse-engineering an undocumented solution.
 
 Advantages include:
 
-Better voltage regulation
-Improved cross-load performance
-Simpler transformer design
-Easier feedback compensation
-Lower output ripple
-Reduced design complexity
+- Extensive application documentation
+- Proven commercial reliability
+- Built-in protection features
+- Excellent EMI performance
+- Large engineering community and reference material
 
-Since modern buck converters typically achieve efficiencies above 90%, the additional conversion stage has minimal impact on overall system efficiency while greatly improving regulation.
+---
 
-Why reinforced creepage and isolation were used
+# Why the Flyback Output is 12V / 2A
 
-This power supply is directly connected to the AC mains and therefore requires proper electrical isolation between the primary and secondary circuits.
+Although the original design target was:
 
-The PCB is designed with:
+- 12V @ 1A
+- 5V @ 1A
 
-Reinforced isolation barrier
-Minimum 6 mm creepage
-Isolation slot beneath the transformer and optocoupler
-Separate primary and secondary copper pours
-No routing across the isolation barrier
+both outputs may be required simultaneously.
 
-These measures reduce the risk of dielectric breakdown and improve electrical safety during long-term operation.
+Since the 5V rail is generated from the 12V rail using a buck converter, the flyback stage must supply:
 
-Why input protection components were included
+- External 12V load
+- Power consumed by the buck converter
+- Conversion losses
 
-An offline AC-DC power supply is exposed to surges, inrush current, and electrical noise from the mains supply.
+Therefore, the flyback converter is designed for:
+
+**12V @ 2A (24W)**
+
+This provides sufficient headroom for:
+
+- Continuous full-load operation
+- Buck converter input power
+- Startup transients
+- Component derating
+- Thermal margin
+
+Operating the 30W transformer below its maximum rating also improves efficiency and long-term reliability.
+
+---
+
+# Why Generate 5V Using a Buck Converter
+
+Instead of designing a dual-output flyback converter with separate regulated secondary windings, the design regulates a single **12V output** and derives **5V** using a high-efficiency buck converter.
+
+Advantages include:
+
+- Better voltage regulation
+- Improved cross-load performance
+- Simpler transformer design
+- Easier compensation
+- Lower output ripple
+- Reduced design complexity
+- Easier debugging and testing
+
+Modern synchronous buck converters typically exceed **90% efficiency**, making this approach highly efficient while maintaining excellent output regulation.
+
+---
+
+# Why Reinforced Creepage and Isolation Were Used
+
+Since this power supply connects directly to the AC mains, electrical isolation between the primary and secondary circuits is essential.
+
+The PCB incorporates:
+
+- Reinforced isolation barrier
+- Minimum 6 mm creepage distance
+- Isolation slot beneath the transformer
+- Isolation slot beneath the optocoupler
+- Separate primary and secondary copper pours
+- No routing across the isolation barrier
+
+These measures improve electrical safety while reducing the risk of dielectric breakdown during long-term operation.
+
+---
+
+# Why Input Protection Components Were Included
+
+An offline AC-DC converter is exposed to:
+
+- Mains voltage surges
+- Inrush current
+- Differential-mode noise
+- Common-mode noise
 
 The input stage therefore includes:
 
-Fuse – protects against catastrophic faults.
-MOV – suppresses mains surge voltages.
-NTC thermistor – limits inrush current when charging the bulk capacitor.
-Common-mode choke – reduces conducted EMI.
-X-class safety capacitor – suppresses differential-mode noise.
-Y-class safety capacitor – provides a controlled return path for common-mode noise while maintaining isolation.
+| Component | Purpose |
+|-----------|---------|
+| Fuse | Protects against catastrophic faults |
+| MOV | Absorbs mains surge voltages |
+| NTC Thermistor | Limits inrush current |
+| Common-Mode Choke | Reduces conducted EMI |
+| X-Class Capacitor | Suppresses differential-mode noise |
+| Y-Class Capacitor | Suppresses common-mode noise while maintaining isolation |
 
-These components improve safety, reliability, and electromagnetic compatibility.
+These components improve:
 
-Why I used a commercially available transformer instead of designing my own
+- Safety
+- Reliability
+- EMC performance
+- Regulatory compliance
 
-Designing a flyback transformer requires detailed magnetic design, core selection, winding calculations, insulation design, leakage inductance optimization, and validation under varying operating conditions.
+---
 
-For this project, I intentionally chose a commercially manufactured transformer to focus on the design of the complete power supply while relying on a transformer with documented characteristics and safety approvals. This approach reflects common industrial practice, where engineers often build products around qualified magnetic components rather than designing custom transformers unless high-volume production justifies the additional development effort.
+# Why I Used a Commercially Available Transformer
 
-Why this topology was chosen
+Designing a flyback transformer requires:
 
-Among isolated converter topologies, the flyback converter offers the best balance of simplicity, cost, and performance for power levels below approximately 50 W.
+- Core selection
+- Air-gap calculation
+- Turns ratio calculation
+- Wire gauge selection
+- Leakage inductance optimization
+- Thermal validation
+- Safety insulation design
+
+Rather than designing a custom transformer, this project uses a commercially manufactured transformer with documented characteristics and safety approvals.
+
+This reflects common industrial practice, where qualified magnetic components are often preferred over custom designs unless high-volume production justifies dedicated transformer development.
+
+---
+
+# Why the Flyback Topology Was Chosen
+
+For power levels below approximately **50W**, the flyback converter offers the best balance of simplicity, cost, efficiency, and isolation.
 
 Advantages include:
 
-Single magnetic component
-Galvanic isolation
-Wide input voltage capability
-Low component count
-Compact PCB footprint
-Mature design ecosystem
-Good efficiency in the 20–30 W range
+- Single magnetic component
+- Galvanic isolation
+- Universal input capability
+- Low component count
+- Compact PCB footprint
+- Mature design ecosystem
+- Excellent efficiency in the 20–30W range
 
-For a universal-input 24 W power supply, the flyback topology provides an excellent compromise between complexity and performance.
+For a universal-input **24W** power supply, the flyback topology provides an ideal balance between performance, manufacturability, and design complexity.
+
+---
+
+# Project Design Philosophy
+
+The objective of this project is not simply to produce a functioning power supply, but to develop a **professionally engineered offline SMPS** using industry-standard design practices.
+
+Key design goals include:
+
+- Reliability over minimum cost
+- Component selection based on manufacturer documentation
+- Compliance with high-voltage PCB layout practices
+- Robust thermal performance
+- Proper EMI mitigation
+- Comprehensive documentation
+- Reproducible design decisions
+
+The final result aims to demonstrate not only PCB design skills but also a solid understanding of power electronics, isolation techniques, component selection, safety considerations, and engineering validation.
