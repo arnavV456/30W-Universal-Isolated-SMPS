@@ -29,3 +29,9 @@
 - Output regulation
 - Buck-generated 5V rail
 - Designed in KiCad
+
+
+# Schematic
+
+![Schematic](Images/schematic.png)
+
