@@ -24,7 +24,6 @@ This project implements a complete offline SMPS including EMI filtering, surge p
 |-----------|-------|
 | Input Voltage | 85–265 VAC |
 | Output 1 | 12V @ 2.5A |
-| Output 2 | 5V @ 1A |
 | Output Power | 30W |
 | Isolation | 4 kV |
 | Topology | Flyback |
