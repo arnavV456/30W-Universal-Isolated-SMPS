@@ -18,12 +18,6 @@ This project implements a complete offline SMPS including EMI filtering, surge p
 
 ---
 
-# 3D Render
-
-![3D PCB](Images/PCB_3D.png)
-
----
-
 ## Specifications
 
 | Parameter | Value |
@@ -134,14 +128,11 @@ Hardware/
 
 Manufacturing/
 ├── Gerbers
-├── Drill Files
-├── BOM
-└── Pick & Place
+└── Drill Files
 
 Images/
 ├── PCB_Front.png
 ├── PCB_Back.png
-├── PCB_3D.png
 └── schematic.png
 
 3D Models/
